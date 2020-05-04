@@ -96,7 +96,6 @@ public class MyLock implements Lock {
 					System.out.println(getName()+",释放锁");
 					myLock.unlock();
 					myLock.unlock();
-
 					System.out.println(num);
 				}
 			};
