@@ -9,7 +9,6 @@ public class ReentrantLockTest {
 	private static ReentrantLock noFairReentrantLock = new ReentrantLock();
 
 	public static void main(String[] args) {
-
 		/**
 		 * 公平锁
 		 */
