@@ -45,27 +45,26 @@ public class ReentrantZookeeperLock {
 				}
 			}
 		}
-		if (Thread.currentThread() == owner) {
-			state.getAndAdd(1);
-		} else {
-			owner=Thread.currentThread();
-			state.set(1);
-		}
 	}
 
 	public boolean tryLock() {
 		try {
+			if(Thread.currentThread()==owner) {
+				state.addAndGet(1);
+				return true;
+			}
+			byte[] data = Thread.currentThread().getName().getBytes();
 			if (zooKeeper.exists(lock, false) == null) {
-				byte[] data = Thread.currentThread().getName().getBytes();
 				zooKeeper.create(lock, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+				owner=Thread.currentThread();
+				state.addAndGet(1);
 				return true;
 			}
 			return false;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return false;
 		}
-		
+
 	}
 
 	public void await() {
@@ -88,7 +87,7 @@ public class ReentrantZookeeperLock {
 	}
 
 	public void unlock() {
-		if (owner==Thread.currentThread() &&state.addAndGet(-1) == 0  ) {
+		if (owner == Thread.currentThread() && state.addAndGet(-1) == 0) {
 			try {
 				zooKeeper.delete(lock, -1);
 			} catch (Exception e) {
@@ -99,11 +98,13 @@ public class ReentrantZookeeperLock {
 
 	public static void main(String[] args) {
 		ReentrantZookeeperLock reentrantZookeeperLock = new ReentrantZookeeperLock("127.0.0.1", 2181, "myLock");
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 10; i++) {
 			Thread thread = new Thread() {
 				public void run() {
 					reentrantZookeeperLock.lock();
+					reentrantZookeeperLock.lock();
 					System.out.println(getName() + ",获取锁成功");
+					reentrantZookeeperLock.unlock();
 					reentrantZookeeperLock.unlock();
 					System.out.println(getName() + ",释放锁成功");
 				}
