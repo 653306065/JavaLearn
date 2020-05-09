@@ -70,6 +70,7 @@ public class ReentrantZookeeperLock {
 	public void await() {
 		try {
 			CountDownLatch countDownLatch = new CountDownLatch(1);
+			//这里存在多次监听的情况，需要优化
 			zooKeeper.addWatch(lock, new Watcher() {
 				public void process(WatchedEvent event) {
 					if (event.getType() == EventType.NodeDeleted) {
@@ -95,15 +96,18 @@ public class ReentrantZookeeperLock {
 			}
 		}
 	}
+	
+	public static int value=0;
 
 	public static void main(String[] args) {
 		ReentrantZookeeperLock reentrantZookeeperLock = new ReentrantZookeeperLock("127.0.0.1", 2181, "myLock");
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 100; i++) {
 			Thread thread = new Thread() {
 				public void run() {
 					reentrantZookeeperLock.lock();
 					reentrantZookeeperLock.lock();
 					System.out.println(getName() + ",获取锁成功");
+					System.out.println(value++);
 					reentrantZookeeperLock.unlock();
 					reentrantZookeeperLock.unlock();
 					System.out.println(getName() + ",释放锁成功");
