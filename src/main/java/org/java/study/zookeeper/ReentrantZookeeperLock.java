@@ -98,7 +98,7 @@ public class ReentrantZookeeperLock {
 
 	public static void main(String[] args) {
 		ReentrantZookeeperLock reentrantZookeeperLock = new ReentrantZookeeperLock("127.0.0.1", 2181, "myLock");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 10000; i++) {
 			Thread thread = new Thread() {
 				public void run() {
 					reentrantZookeeperLock.lock();
