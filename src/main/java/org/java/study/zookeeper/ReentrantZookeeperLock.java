@@ -13,13 +13,13 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 
 public class ReentrantZookeeperLock {
 
-	public AtomicInteger state = new AtomicInteger(0);
+	public AtomicInteger state = new AtomicInteger(0);//状态标识
 
 	private ZooKeeper zooKeeper;
 
-	private String lock;
+	private String lock;//锁的字符串
 
-	private Thread owner;
+	private Thread owner;//当前占有线程
 
 	public ReentrantZookeeperLock(String host, int port, String lock) {
 		this.lock = "/" + lock;
@@ -35,11 +35,19 @@ public class ReentrantZookeeperLock {
 			return null;
 		}
 	}
+	
+	public void close() {
+		try {
+			zooKeeper.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void lock() {
-		if (!tryLock()) {
-			await();
-			while (true) {
+		if (!tryLock()) {//尝试获取锁
+			while (true) {//继续测试获取
+				await();//获取不到等待通知
 				if (tryLock()) {
 					break;
 				}
@@ -49,13 +57,13 @@ public class ReentrantZookeeperLock {
 
 	public boolean tryLock() {
 		try {
-			if(Thread.currentThread()==owner) {
+			if(Thread.currentThread()==owner) {//重入性
 				state.addAndGet(1);
 				return true;
 			}
 			byte[] data = Thread.currentThread().getName().getBytes();
 			if (zooKeeper.exists(lock, false) == null) {
-				zooKeeper.create(lock, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+				zooKeeper.create(lock, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);//zookeeper保证create的原子性(只有一个线程能创建)
 				owner=Thread.currentThread();
 				state.addAndGet(1);
 				return true;
@@ -115,6 +123,7 @@ public class ReentrantZookeeperLock {
 			};
 			thread.start();
 		}
+		reentrantZookeeperLock.close();
 	}
 
 }
