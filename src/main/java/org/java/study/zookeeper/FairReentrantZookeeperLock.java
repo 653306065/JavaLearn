@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.AddWatchMode;
 import org.apache.zookeeper.CreateMode;
@@ -15,6 +14,7 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 
 /**
  * 公平的可重入的zookeeper分布式锁
+ * 
  * @author fuqiang
  *
  */
@@ -46,9 +46,9 @@ public class FairReentrantZookeeperLock {
 	}
 
 	public void lock() {
-		if (!tryLock()) {//获取锁
-			while (true) {//自旋
-				await();//等待通知
+		if (!tryLock()) {// 获取锁
+			while (true) {// 自旋
+				await();// 等待通知
 				if (tryLock()) {
 					break;
 				}
@@ -71,7 +71,7 @@ public class FairReentrantZookeeperLock {
 			String previous = lock + text + index;
 			CountDownLatch countDownLatch = new CountDownLatch(1);
 			if (zooKeeper.exists(previous, false) != null) {
-				zooKeeper.addWatch(previous, new Watcher() {//监听上一个节点的删除事件
+				zooKeeper.addWatch(previous, new Watcher() {// 监听上一个节点的删除事件
 					@Override
 					public void process(WatchedEvent event) {
 						if (event.getType() == EventType.NodeDeleted) {
@@ -89,20 +89,20 @@ public class FairReentrantZookeeperLock {
 
 	public boolean tryLock() {
 		try {
-			if (Thread.currentThread() == owner) {//重入性
+			if (Thread.currentThread() == owner) {// 重入性
 				state.incrementAndGet();
 				return true;
 			}
 			byte[] data = Thread.currentThread().getName().getBytes();
 			String value = threadLocal.get();
-			if (value == null) {//如果是第一次进来，就创建排队的节点
+			if (value == null) {// 如果是第一次进来，就创建排队的节点
 				String sequence = zooKeeper.create(lock, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-				threadLocal.set(sequence);//保存到threadLocal中
+				threadLocal.set(sequence);// 保存到threadLocal中
 				value = sequence;
 			}
 			List<String> list = zooKeeper.getEphemerals(lock);
 			Collections.sort(list);
-			if (list.get(0).equals(value)) {//如果当前节点是在临时节点的第一个就获得锁
+			if (list.get(0).equals(value)) {// 如果当前节点是在临时节点的第一个就获得锁
 				owner = Thread.currentThread();
 				state.addAndGet(1);
 				return true;
@@ -112,7 +112,7 @@ public class FairReentrantZookeeperLock {
 			return false;
 		}
 	}
-	
+
 	public String getSequence() {
 		return this.threadLocal.get();
 	}
@@ -132,13 +132,14 @@ public class FairReentrantZookeeperLock {
 	public static int value = 0;
 
 	public static void main(String[] args) {
-		FairReentrantZookeeperLock fairReentrantZookeeperLock = new FairReentrantZookeeperLock("127.0.0.1", 2181,"lock10");
-		for (int i = 0; i < 1000; i++) {
+		FairReentrantZookeeperLock fairReentrantZookeeperLock = new FairReentrantZookeeperLock("127.0.0.1", 2181,
+				"wd");
+		for (int i = 0; i < 100; i++) {
 			Thread thrad = new Thread() {
 				public void run() {
 					fairReentrantZookeeperLock.lock();
 					fairReentrantZookeeperLock.lock();
-					System.out.println( fairReentrantZookeeperLock.getSequence());
+					System.out.println(fairReentrantZookeeperLock.getSequence());
 					System.out.println(value++);
 					fairReentrantZookeeperLock.unlock();
 					fairReentrantZookeeperLock.unlock();
