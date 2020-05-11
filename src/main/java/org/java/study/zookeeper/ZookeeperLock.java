@@ -86,7 +86,10 @@ public class ZookeeperLock {
 	public static int value=0;
 	
 	public static void main(String[] args) {
-		ZookeeperLock zookeepreLock = new ZookeeperLock("127.0.0.1", 2181, "myLock");
+		//同时开启2个main方法，验证最后的运行时间，判断分布式锁是否生效
+		ZookeeperLock zookeepreLock = new ZookeeperLock("127.0.0.1", 2181, "locky");
+		CountDownLatch countDownLatch=new CountDownLatch(10);
+		long startTime= System.currentTimeMillis();
 		for (int i = 0; i < 10; i++) {
 			final int n = i;
 			Thread thread = new Thread("thread" + n) {
@@ -94,12 +97,25 @@ public class ZookeeperLock {
 					zookeepreLock.lock();
 					System.out.println(getName() + ",获取锁成功");
 					System.out.println("value:"+value++);
+					try {
+						this.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					zookeepreLock.unlock();
 					System.out.println(getName() + ",释放锁成功");
+					countDownLatch.countDown();
 				}
 			};
 			thread.start();
 		}
+		try {
+			countDownLatch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		long endTime= System.currentTimeMillis();
+        System.out.println((endTime-startTime)/1000f);
 
 	}
 }
