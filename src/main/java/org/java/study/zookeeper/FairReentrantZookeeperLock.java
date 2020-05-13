@@ -122,6 +122,7 @@ public class FairReentrantZookeeperLock {
 			if (Thread.currentThread() == owner && state.decrementAndGet() == 0) {
 				String value = threadLocal.get();
 				zooKeeper.delete(value, -1);
+				owner=null;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
