@@ -26,15 +26,15 @@ public class Producer {
 		Queue queue=session.createQueue(queueName);
 		MessageProducer messageProducer=session.createProducer(queue);
 		//ActiveMQTextMessage ActiveMQTextMessage =new ActiveMQTextMessage();
-//		for(int i=0;i<1000;i++) {
-//			TextMessage textMessage=session.createTextMessage("my text message");
-//			messageProducer.send(textMessage);
-//		}
-		while(true) {
-			TextMessage textMessage=session.createTextMessage(UUID.randomUUID().toString());
+		for(int i=0;i<100;i++) {
+			TextMessage textMessage=session.createTextMessage("my text message "+i);
 			messageProducer.send(textMessage);
 		}
-//		session.close();
-//		connection.close();
+//		while(true) {
+//			TextMessage textMessage=session.createTextMessage(UUID.randomUUID().toString());
+//			messageProducer.send(textMessage);
+//		}
+		session.close();
+		connection.close();
 	}
 }
