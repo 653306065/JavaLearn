@@ -13,5 +13,8 @@ public class LambdaTest {
 		list.stream().forEach(value->{
 			System.out.println(value);
 		});
+		list.stream().filter((value)->("6533".equals(value))).forEach(value->{
+			System.out.println(value);
+		});
 	}
 }
