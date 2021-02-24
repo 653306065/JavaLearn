@@ -13,25 +13,21 @@ public class StampedLockTest {
 
 		//write 
 		for (int i = 0; i < 1000; i++) {
-			new Thread() {
-				public void run() {
-					long stamp= stampedLock.writeLock();
-					uuid=UUID.randomUUID().toString();
-					System.out.println("write:"+uuid);
-					stampedLock.unlock(stamp);
-				}
-			}.start();
+			new Thread(() -> {
+				long stamp= stampedLock.writeLock();
+				uuid=UUID.randomUUID().toString();
+				System.out.println("write:"+uuid);
+				stampedLock.unlock(stamp);
+			}).start();
 		}
 		
 		//read
 		for(int i=0;i<1000;i++) {
-			new Thread() {
-				public void run() {
-					long stamp= stampedLock.readLock();
-					System.out.println("read:"+uuid);
-					stampedLock.unlock(stamp);
-				}
-			}.start();
+			new Thread(() -> {
+				long stamp= stampedLock.readLock();
+				System.out.println("read:"+uuid);
+				stampedLock.unlock(stamp);
+			}).start();
 		}
 
 	}

@@ -14,34 +14,30 @@ public class ConditionTest {
 	}
 
 	public static void main(String[] args) {
-		new Thread() {
-			public void run() {
-				lock.lock();
-				System.out.println("获取成功");
-				try {
-					condition.await();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				System.out.println("重新获得锁");
-				lock.unlock();
+		new Thread(() -> {
+			lock.lock();
+			System.out.println("获取成功");
+			try {
+				condition.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		}.start();
+			System.out.println("重新获得锁");
+			lock.unlock();
+		}).start();
 		
 		
-		new Thread() {
-			public void run() {
-				try {
-					sleep(1000);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-				lock.lock();
-				System.out.println("获取成功");
-				condition.signal();
-				lock.unlock();
+		new Thread(() -> {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
 			}
-		}.start();
+			lock.lock();
+			System.out.println("获取成功");
+			condition.signal();
+			lock.unlock();
+		}).start();
 	}
 
 }

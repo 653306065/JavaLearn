@@ -4,6 +4,7 @@ import java.util.concurrent.Semaphore;
 
 public class SemaphoreTest {
 
+	//信号量，限制同时可以运行的线程数
 	public static Semaphore semaphore=new Semaphore(10);
 	
 	public static void main(String[] args) {

@@ -8,17 +8,15 @@ public class CyclicBarrierTest {
 	public static void main(String[] args) {
 		for (int i = 0; i < 10; i++) {
 			final  int t=i;
-			new Thread() {
-				public void run() {
-					try {
-						sleep(t*1000);
-						cyclicBarrier.await();
-						System.out.println(System.currentTimeMillis());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+			new Thread(() -> {
+				try {
+					Thread.sleep(t*1000);
+					cyclicBarrier.await();
+					System.out.println(System.currentTimeMillis());
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			}.start();
+			}).start();
 		}
 	}
 }
