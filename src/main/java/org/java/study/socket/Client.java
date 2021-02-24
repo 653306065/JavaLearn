@@ -1,8 +1,9 @@
+package org.java.study.socket;
+
 import java.io.*;
 import java.net.*;
 
-
-public class Server {
+public class Client {
 
     public static void main(String[] args) throws Exception {
         // TODO 自动生成的方法存根
@@ -15,13 +16,11 @@ public class Server {
         final String server = "Server:";
 
         int port = 4000;
-        //byte ipAddressTemp[] = {127, 0, 0, 1};
-        //InetAddress ipAddress = InetAddress.getByAddress(ipAddressTemp);
+        byte ipAddressTemp[] = {127, 0, 0, 1};
+        InetAddress ipAddress = InetAddress.getByAddress(ipAddressTemp);
 
-        //首先直接创建serversocket
-        ServerSocket serverSocket = new ServerSocket(port);
-        //调用服务器的accept（）进行阻塞（程序会在这等待），当有申请连接时会打开阻塞并返回一个socket
-        Socket socket = serverSocket.accept();
+        //首先直接创建socket,端口号1~1023为系统保存，一般设在1023之外
+        Socket socket = new Socket(ipAddress, port);
 
         //创建三个流，系统输入流BufferedReader systemIn，socket输入流BufferedReader socketIn，socket输出流PrintWriter socketOut;
         BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
@@ -30,18 +29,18 @@ public class Server {
 
         while (readline != "bye") {
 
-            inTemp = socketIn.readLine();
-            System.out.println(client + turnLine + inTemp);
-            System.out.println(server);
-
+            System.out.println(client);
             readline = systemIn.readLine();
+            //System.out.println(readline);
 
             socketOut.println(readline);
-            socketOut.flush();    //赶快刷新使Client收到，也可以换成socketOut.println(readline, ture)
+            socketOut.flush();    //赶快刷新使Server收到，也可以换成socketOut.println(readline, ture)
 
             //outTemp = readline;
+            inTemp = socketIn.readLine();
 
-            //System.out.println(server);
+            //System.out.println(client + outTemp);
+            System.out.println(server + turnLine + inTemp);
 
         }
 
@@ -49,7 +48,7 @@ public class Server {
         socketIn.close();
         socketOut.close();
         socket.close();
-        serverSocket.close();
 
     }
+
 }
