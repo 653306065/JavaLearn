@@ -22,11 +22,18 @@ public class Server {
             Socket socket = serverSocket.accept();
             threadPoolExecutor.execute(() -> {
                 try {
-                    InputStream inputStream = socket.getInputStream();
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-                    byte[] bytes = bufferedInputStream.readAllBytes();
-                    System.out.println(new String(bytes));
-                    socket.close();
+                    while (true){
+                        InputStream inputStream = socket.getInputStream();
+                        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+                        byte[] bytes = bufferedInputStream.readAllBytes();
+                        System.out.println(new String(bytes));
+
+                        String message = Thread.currentThread().getName() + "," + System.currentTimeMillis();
+                        OutputStream outputStream = socket.getOutputStream();
+                        outputStream.write(message.getBytes(StandardCharsets.UTF_8));
+                        outputStream.flush();
+                    }
+                    //socket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
