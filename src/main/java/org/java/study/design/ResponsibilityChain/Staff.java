@@ -16,8 +16,9 @@ public abstract class Staff {
         this.level = level;
     }
 
-    protected void setNextStaff(Staff staff) {
+    protected Staff setNextStaff(Staff staff) {
         this.nextStaff = staff;
+        return nextStaff;
     }
 
     public void doWork() {

@@ -1,10 +1,8 @@
 package org.java.study.design.ResponsibilityChain;
 
-//程序员
-public class Programmer extends Staff{
-
-    public Programmer() {
-        super("programmer", 666);
+public class Leader extends Staff{
+    public Leader() {
+        super("Leader", 777);
     }
 
     @Override

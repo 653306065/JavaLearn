@@ -1,5 +1,6 @@
 package org.java.study.design.ResponsibilityChain;
 
+//老板
 public class Boss extends Staff{
 
 
