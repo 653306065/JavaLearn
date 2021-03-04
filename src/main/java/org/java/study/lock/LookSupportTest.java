@@ -1,4 +1,4 @@
-package org.java.study.lockSupport;
+package org.java.study.lock;
 
 import java.util.concurrent.locks.LockSupport;
 
