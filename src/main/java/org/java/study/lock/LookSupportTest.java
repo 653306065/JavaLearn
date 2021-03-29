@@ -18,5 +18,27 @@ public class LookSupportTest {
 			e.printStackTrace();
 		}
 		LockSupport.unpark(thread);
+
+		//ABC顺序执行问题
+		Thread C= new Thread(() -> {
+			LockSupport.park();
+			System.out.println("C");
+		});
+
+		Thread B= new Thread(() -> {
+			LockSupport.park();
+			System.out.println("B");
+			LockSupport.unpark(C);
+		});
+
+		Thread A= new Thread(() -> {
+			LockSupport.park();
+			System.out.println("A");
+			LockSupport.unpark(B);
+		});
+		C.start();
+		B.start();
+		A.start();
+		LockSupport.unpark(A);
 	}
 }
