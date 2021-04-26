@@ -49,16 +49,14 @@ static void ensure_join(JavaThread* thread) {
 public class JoinTest {
 
 	public static void main(String[] args) {
-		Thread thread=new Thread() {
-			public void run() {
-				try {
-					sleep(5000);
-					System.out.println("结束休眠");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+		Thread thread=new Thread(()->{
+			try {
+				Thread.sleep(5000);
+				System.out.println("结束休眠");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		};
+		});
 		try {
 			thread.start();
 			thread.join();
