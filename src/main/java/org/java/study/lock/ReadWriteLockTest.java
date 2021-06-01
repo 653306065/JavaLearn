@@ -18,19 +18,21 @@ public class ReadWriteLockTest {
 
 		for (int i = 0; i < 100; i++) {
 			new Thread(() -> {
-				reentrantReadWriteLock.readLock().lock();
-				System.out.println("read:"+value);
-				reentrantReadWriteLock.readLock().unlock();
-			}).start();
-		}
-
-		for (int i = 0; i < 100; i++) {
-			new Thread(() -> {
 				reentrantReadWriteLock.writeLock().lock();
 				value = UUID.randomUUID().toString();
 				System.out.println("write:"+value);
 				reentrantReadWriteLock.writeLock().unlock();
 			}).start();
 		}
+
+		for (int i = 0; i < 100; i++) {
+			new Thread(() -> {
+				reentrantReadWriteLock.readLock().lock();
+				System.out.println("read:"+value);
+				reentrantReadWriteLock.readLock().unlock();
+			}).start();
+		}
+
+
 	}
 }
