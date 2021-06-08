@@ -1,6 +1,7 @@
 package org.java.study.annotation;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
 import java.util.List;
 
 public class Test {
